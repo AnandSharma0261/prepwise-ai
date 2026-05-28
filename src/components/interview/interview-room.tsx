@@ -84,7 +84,7 @@ export function InterviewRoom({ interview }: Props) {
     });
   }
 
-  function toggleMic() {
+  async function toggleMic() {
     if (!speech.isSupported) {
       toast.error(
         speech.errorCode === "network"
@@ -97,10 +97,26 @@ export function InterviewRoom({ interview }: Props) {
     if (speech.isListening) {
       speech.stop();
       saveCurrentTranscript();
-    } else {
-      speech.reset();
-      speech.setTranscript(answers[currentIdx] ?? "");
-      speech.start();
+      return;
+    }
+    speech.reset();
+    speech.setTranscript(answers[currentIdx] ?? "");
+    const loadingToast = toast.loading("Requesting microphone access...");
+    await speech.start();
+    toast.dismiss(loadingToast);
+
+    // Inspect any error code the hook flagged during start().
+    const code = speech.errorCode;
+    if (code === "not-allowed") {
+      toast.error(
+        "Microphone blocked. Click the lock icon in the address bar and allow microphone access, then try again."
+      );
+    } else if (code === "audio-capture") {
+      toast.error("No microphone found on this device.");
+    } else if (code === "network") {
+      toast.error("Voice service unreachable. Try text mode.");
+    } else if (code === "start-failed" || code === "permission-failed") {
+      toast.error("Couldn't start the mic. Try refreshing the page.");
     }
   }
 

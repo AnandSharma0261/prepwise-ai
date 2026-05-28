@@ -98,14 +98,40 @@ export function useSpeechRecognition() {
     };
   }, []);
 
-  const start = useCallback(() => {
+  const start = useCallback(async () => {
     const r = recognitionRef.current;
-    if (!r) return;
+    if (!r) {
+      setErrorCode("unsupported");
+      return;
+    }
+
+    // Explicitly request mic permission first. This gives the browser a clean,
+    // user-gesture-triggered prompt and lets us catch denial cleanly.
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Immediately release the stream — SpeechRecognition manages its own.
+        stream.getTracks().forEach((t) => t.stop());
+      } catch (e) {
+        const name = (e as DOMException)?.name ?? "";
+        if (name === "NotAllowedError" || name === "SecurityError") {
+          setErrorCode("not-allowed");
+        } else if (name === "NotFoundError") {
+          setErrorCode("audio-capture");
+        } else {
+          setErrorCode("permission-failed");
+        }
+        return;
+      }
+    }
+
     try {
+      setErrorCode(null);
       r.start();
       setIsListening(true);
     } catch (e) {
       console.error("[speech] start failed:", e);
+      setErrorCode("start-failed");
     }
   }, []);
 
