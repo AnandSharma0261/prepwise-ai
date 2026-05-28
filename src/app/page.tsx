@@ -1,12 +1,23 @@
-export default function Home() {
+import { LandingNav } from "@/components/shared/landing-nav";
+import { Footer } from "@/components/shared/footer";
+import { Hero } from "@/components/landing/hero";
+import { Features } from "@/components/landing/features";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { Testimonials } from "@/components/landing/testimonials";
+import { CTA } from "@/components/landing/cta";
+
+export default function HomePage() {
   return (
-    <main className="flex-1 flex items-center justify-center px-4">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight">PrepWise AI</h1>
-        <p className="text-muted-foreground mt-2 text-sm">
-          Landing page coming soon.
-        </p>
-      </div>
-    </main>
+    <>
+      <LandingNav />
+      <main className="flex-1">
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <Testimonials />
+        <CTA />
+      </main>
+      <Footer />
+    </>
   );
 }
