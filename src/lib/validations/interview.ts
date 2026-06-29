@@ -25,5 +25,36 @@ export const finalizeInterviewSchema = z.object({
   ),
 });
 
+// --- Question CRUD (used by Server Actions) ---
+// ObjectId validated via regex here so this file stays client-safe
+// (it's imported by client components) and never pulls in mongoose.
+const objectId = z.string().regex(/^[a-f\d]{24}$/i, "Invalid interview id");
+
+export const addQuestionSchema = z.object({
+  interviewId: objectId,
+  question: z
+    .string()
+    .trim()
+    .min(5, "Question must be at least 5 characters")
+    .max(500, "Question is too long"),
+});
+
+export const editQuestionSchema = z.object({
+  interviewId: objectId,
+  index: z.number().int().min(0),
+  question: z
+    .string()
+    .trim()
+    .min(5, "Question must be at least 5 characters")
+    .max(500, "Question is too long"),
+});
+
+export const deleteQuestionSchema = z.object({
+  interviewId: objectId,
+  index: z.number().int().min(0),
+});
+
 export type CreateInterviewInput = z.infer<typeof createInterviewSchema>;
 export type FinalizeInterviewInput = z.infer<typeof finalizeInterviewSchema>;
+export type AddQuestionInput = z.infer<typeof addQuestionSchema>;
+export type EditQuestionInput = z.infer<typeof editQuestionSchema>;

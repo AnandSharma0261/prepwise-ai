@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -204,13 +205,19 @@ export function InterviewRoom({ interview }: Props) {
           <h1 className="text-2xl font-bold tracking-tight capitalize">
             {interview.role}
           </h1>
-          <div className="flex gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-2">
             <Badge variant="default" className="capitalize">
               {interview.level}
             </Badge>
             <Badge variant="accent" className="capitalize">
               {interview.type}
             </Badge>
+            <Link
+              href={`/interview/${interview._id}/manage`}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+            >
+              Edit questions
+            </Link>
           </div>
         </div>
 
